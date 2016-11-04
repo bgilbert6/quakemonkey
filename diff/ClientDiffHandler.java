@@ -114,17 +114,17 @@ public class ClientDiffHandler<T extends AbstractMessage> implements
 			LabeledMessage lm = (LabeledMessage) m;
 			T message = (T) lm.getMessage();
 
-			boolean isNew = curPos < lm.getLabel()
-					|| lm.getLabel() - curPos > Short.MAX_VALUE / 2;
+			boolean isNew = lm.getLabel() == 0 || curPos < lm.getLabel()
+				 	|| lm.getLabel() - curPos > Short.MAX_VALUE / 2;
 
-			// message is too old
-			if (curPos - lm.getLabel() > numSnapshots
-					|| (lm.getLabel() - curPos > Short.MAX_VALUE / 2 && Short.MAX_VALUE
-							- lm.getLabel() + curPos > numSnapshots)) {
-				log.log(Level.INFO,
-						"Discarding too old message: " + lm.getLabel()
-								+ " vs. cur " + curPos);
+			if (lm.getLabel() > 0) {
+			    // message is too old
+			    if (curPos - lm.getLabel() > numSnapshots
+				    || (lm.getLabel() - curPos > Short.MAX_VALUE / 2 && Short.MAX_VALUE
+				    - lm.getLabel() + curPos > numSnapshots)) {
+				log.log(Level.INFO, "Discarding too old message: {0} vs. cur {1}", new Object[]{lm.getLabel(), curPos});
 				return;
+			    }
 			}
 
 			if (cls.isInstance(lm.getMessage())) { // received full message
